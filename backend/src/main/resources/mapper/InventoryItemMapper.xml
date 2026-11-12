@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.InventoryItemMapper">
+
+    <sql id="Base_Column_List">
+        id, task_id, assets_id, assets_no, assets_name, model, category,
+        department_id, department_name, staff_id,
+        concat(ifnull(staff_name, ''), if((select s.status from staff s where s.id = inventory_item.staff_id) = '离职', '（离职）', '')) as staff_name,
+        location, actual_location,
+        item_status, deal_status, deal_type, deal_remark, deal_user_id, deal_user, deal_time,
+        is_extra, scanner_id, scanner_name, scan_time, comment, create_time, update_time
+    </sql>
+
+    <insert id="insert" parameterType="com.example.entity.InventoryItem" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO inventory_item(
+            task_id, assets_id, assets_no, assets_name, model, category,
+            department_id, department_name, staff_id, staff_name, location, actual_location,
+            item_status, deal_status, deal_type, deal_remark, deal_user_id, deal_user, deal_time,
+            is_extra, scanner_id, scanner_name, scan_time, comment, create_time, update_time
+        ) VALUES (
+            #{taskId}, #{assetsId}, #{assetsNo}, #{assetsName}, #{model}, #{category},
+            #{departmentId}, #{departmentName}, #{staffId}, #{staffName}, #{location}, #{actualLocation},
+            #{itemStatus}, #{dealStatus}, #{dealType}, #{dealRemark}, #{dealUserId}, #{dealUser}, #{dealTime},
+            #{isExtra}, #{scannerId}, #{scannerName}, #{scanTime}, #{comment}, NOW(), NOW()
+        )
+    </insert>
+
+    <insert id="batchInsert">
+        INSERT INTO inventory_item(
+            task_id, assets_id, assets_no, assets_name, model, category,
+            department_id, department_name, staff_id, staff_name, location, actual_location,
+            item_status, is_extra, create_time, update_time
+        ) VALUES
+        <foreach collection="list" item="it" separator=",">
+            (
+                #{it.taskId}, #{it.assetsId}, #{it.assetsNo}, #{it.assetsName}, #{it.model}, #{it.category},
+                #{it.departmentId}, #{it.departmentName}, #{it.staffId}, #{it.staffName}, #{it.location}, #{it.actualLocation},
+                #{it.itemStatus}, #{it.isExtra}, NOW(), NOW()
+            )
+        </foreach>
+    </insert>
+
+    <update id="updateById" parameterType="com.example.entity.InventoryItem">
+        update inventory_item
+        <set>
+            <if test="actualLocation != null">actual_location = #{actualLocation},</if>
+            <if test="itemStatus != null">item_status = #{itemStatus},</if>
+            <if test="dealStatus != null">deal_status = #{dealStatus},</if>
+            <if test="dealType != null">deal_type = #{dealType},</if>
+            <if test="dealRemark != null">deal_remark = #{dealRemark},</if>
+            <if test="dealUserId != null">deal_user_id = #{dealUserId},</if>
+            <if test="dealUser != null">deal_user = #{dealUser},</if>
+            <if test="dealTime != null">deal_time = #{dealTime},</if>
+            <if test="scannerId != null">scanner_id = #{scannerId},</if>
+            <if test="scannerName != null">scanner_name = #{scannerName},</if>
+            <if test="scanTime != null">scan_time = #{scanTime},</if>
+            <if test="comment != null">comment = #{comment},</if>
+            update_time = NOW()
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="selectById" resultType="com.example.entity.InventoryItem">
+        select <include refid="Base_Column_List"/>
+        from inventory_item
+        where id = #{id}
+    </select>
+
+    <select id="selectByTaskAndAssets" resultType="com.example.entity.InventoryItem">
+        select <include refid="Base_Column_List"/>
+        from inventory_item
+        where task_id = #{taskId} AND assets_id = #{assetsId}
+        limit 1
+    </select>
+
+    <select id="selectByTask" resultType="com.example.entity.InventoryItem">
+        select <include refid="Base_Column_List"/>
+        from inventory_item
+        <where>
+            task_id = #{taskId}
+            <if test="itemStatus != null and itemStatus != ''">
+                AND item_status = #{itemStatus}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND (assets_no LIKE CONCAT('%', #{keyword}, '%')
+                     OR assets_name LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+        order by is_extra asc, id asc
+    </select>
+
+    <select id="selectByTaskScope" resultType="com.example.entity.InventoryItem">
+        select <include refid="Base_Column_List"/>
+        from inventory_item
+        <where>
+            task_id = #{taskId}
+            <if test="scanned != null and scanned == 1">
+                AND item_status &lt;&gt; '未盘'
+            </if>
+            <if test="scanned != null and scanned == 0">
+                AND item_status = '未盘'
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND (assets_no LIKE CONCAT('%', #{keyword}, '%')
+                     OR assets_name LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+        order by is_extra asc, id asc
+    </select>
+
+    <select id="countByTask" resultType="java.util.Map">
+        SELECT item_status AS itemStatus, COUNT(*) AS cnt
+        FROM inventory_item
+        WHERE task_id = #{taskId}
+        GROUP BY item_status
+    </select>
+
+    <select id="countPending" resultType="int">
+        SELECT COUNT(*)
+        FROM inventory_item
+        WHERE task_id = #{taskId}
+          AND item_status IN ('盘盈', '盘亏', '异常')
+          AND deal_status = '待处理'
+    </select>
+
+    <select id="workload" resultType="java.util.Map">
+        SELECT scanner_name AS scannerName,
+               COUNT(*) AS total,
+               SUM(CASE WHEN item_status = '正常' THEN 1 ELSE 0 END) AS normalCnt,
+               SUM(CASE WHEN item_status = '异常' THEN 1 ELSE 0 END) AS abnormalCnt,
+               SUM(CASE WHEN item_status = '盘盈' THEN 1 ELSE 0 END) AS profitCnt,
+               SUM(CASE WHEN item_status = '盘亏' THEN 1 ELSE 0 END) AS lossCnt
+        FROM inventory_item
+        WHERE task_id = #{taskId} AND scanner_name IS NOT NULL AND scanner_name != ''
+        GROUP BY scanner_name
+        ORDER BY total DESC
+    </select>
+
+    <update id="markUncheckedAsLoss">
+        UPDATE inventory_item
+        SET item_status = '盘亏', deal_status = '待处理', update_time = NOW()
+        WHERE task_id = #{taskId} AND item_status = '未盘'
+    </update>
+
+    <update id="clearDeal">
+        UPDATE inventory_item
+        SET deal_status = NULL, deal_type = NULL, deal_remark = NULL,
+            deal_user_id = NULL, deal_user = NULL, deal_time = NULL, update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteByTask">
+        DELETE FROM inventory_item WHERE task_id = #{taskId}
+    </delete>
+
+</mapper>

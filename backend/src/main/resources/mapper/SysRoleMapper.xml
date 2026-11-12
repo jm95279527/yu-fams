@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.SysRoleMapper">
+
+    <sql id="Base_Column_List">
+        id, name, code, description, sort, create_time, update_time
+    </sql>
+
+    <select id="selectAll" resultType="com.example.entity.SysRole">
+        select
+        <include refid="Base_Column_List"/>
+        from sys_role
+        <where>
+            <if test="name != null and name != ''">
+                AND name LIKE CONCAT('%', #{name}, '%')
+            </if>
+            <if test="code != null and code != ''">
+                AND code LIKE CONCAT('%', #{code}, '%')
+            </if>
+        </where>
+        order by sort asc, id asc
+    </select>
+
+    <select id="selectById" resultType="com.example.entity.SysRole">
+        select <include refid="Base_Column_List"/>
+        from sys_role
+        where id = #{id}
+    </select>
+
+    <select id="selectByCode" resultType="com.example.entity.SysRole">
+        select <include refid="Base_Column_List"/>
+        from sys_role
+        where code = #{code}
+    </select>
+
+    <insert id="insert" parameterType="com.example.entity.SysRole" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_role(name, code, description, sort, create_time, update_time)
+        values (#{name}, #{code}, #{description}, #{sort}, NOW(), NOW())
+    </insert>
+
+    <update id="updateById" parameterType="com.example.entity.SysRole">
+        update sys_role
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="code != null">code = #{code},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="sort != null">sort = #{sort},</if>
+            update_time = NOW()
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        delete from sys_role where id = #{id}
+    </delete>
+
+    <select id="selectMenuIdsByRoleId" resultType="java.lang.Integer">
+        select menu_id from sys_role_menu where role_id = #{roleId}
+    </select>
+
+    <delete id="deleteRoleMenus">
+        delete from sys_role_menu where role_id = #{roleId}
+    </delete>
+
+    <insert id="batchInsertRoleMenus">
+        insert into sys_role_menu(role_id, menu_id) values
+        <foreach collection="menuIds" item="menuId" separator=",">
+            (#{roleId}, #{menuId})
+        </foreach>
+    </insert>
+
+    <select id="countAdminsByRoleId" resultType="int">
+        select count(*) from admin where role_id = #{roleId}
+    </select>
+
+</mapper>

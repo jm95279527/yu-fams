@@ -1,0 +1,36 @@
+#!/bin/bash
+set -e
+BACK=/opt/yu-fams/Yu-FAMS-SpringBoot-master
+FRONT=/opt/yu-fams/Yu-FAMS-Vue-master
+SRC=/tmp/stage_bk
+export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk
+export PATH=$JAVA_HOME/bin:$PATH
+
+echo "=== sync ==="
+cp -r $SRC/backend/main/java/. $BACK/src/main/java/
+cp -r $SRC/backend/main/resources/. $BACK/src/main/resources/
+cp -r $SRC/frontend/. $FRONT/src/
+echo SYNC_OK
+
+echo "=== migrate db ==="
+mysql -uroot -pYOUR_DB_PASSWORD xm-assets < $BACK/src/main/resources/sql/data_backup.sql
+echo DB_OK
+
+echo "=== build backend ==="
+cd $BACK
+mvn clean package -DskipTests -q > $SRC/build-back.log 2>&1 || { tail -n 80 $SRC/build-back.log; exit 1; }
+echo MVN_OK
+
+echo "=== build frontend ==="
+cd $FRONT
+npm run build > $SRC/build-front.log 2>&1 || { tail -n 80 $SRC/build-front.log; exit 1; }
+echo NPM_OK
+
+echo "=== publish + restart ==="
+rm -rf /www/wwwroot/yufams/*
+cp -r $FRONT/dist/* /www/wwwroot/yufams/
+chown -R www:www /www/wwwroot/yufams
+systemctl restart yufams
+sleep 15
+systemctl is-active yufams
+echo STAGE_BK_DONE

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.SysConfigMapper">
+
+    <select id="selectAll" resultType="com.example.entity.SysConfig">
+        select id, config_key as configKey, config_value as configValue,
+               remark, update_time as updateTime
+        from sys_config
+        order by id asc
+    </select>
+
+    <insert id="save" parameterType="com.example.entity.SysConfig">
+        insert into sys_config (config_key, config_value, update_time)
+        values (#{configKey}, #{configValue}, #{updateTime})
+        on duplicate key update config_value = #{configValue}, update_time = #{updateTime}
+    </insert>
+
+</mapper>

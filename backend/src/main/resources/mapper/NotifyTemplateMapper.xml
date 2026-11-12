@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.NotifyTemplateMapper">
+
+    <sql id="Base_Column_List">
+        id,event_key as eventKey,biz_type as bizType,event_name as eventName,enabled,title,content,
+        create_time as createTime,update_time as updateTime
+    </sql>
+
+    <select id="selectAll" resultType="com.example.entity.NotifyTemplate">
+        select
+        <include refid="Base_Column_List" />
+        from notify_template
+        order by id asc
+    </select>
+
+    <select id="selectByEventKey" resultType="com.example.entity.NotifyTemplate">
+        select
+        <include refid="Base_Column_List" />
+        from notify_template
+        where event_key = #{eventKey}
+        limit 1
+    </select>
+
+    <update id="updateById" parameterType="com.example.entity.NotifyTemplate">
+        update notify_template
+        <set>
+            <if test="enabled != null">enabled = #{enabled},</if>
+            <if test="title != null">title = #{title},</if>
+            <if test="content != null">content = #{content},</if>
+            update_time = #{updateTime},
+        </set>
+        where id = #{id}
+    </update>
+
+</mapper>

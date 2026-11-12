@@ -1,0 +1,14 @@
+[Unit]
+Description=Yu-FAMS SpringBoot Service
+After=network.target mysqld.service
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/yu-fams/Yu-FAMS-SpringBoot-master
+ExecStart=/usr/lib/jvm/java-1.8.0-openjdk/bin/java -jar /opt/yu-fams/Yu-FAMS-SpringBoot-master/target/springboot-0.0.1-SNAPSHOT.jar --server.port=89
+Restart=on-failure
+RestartSec=10
+User=root
+
+[Install]
+WantedBy=multi-user.target

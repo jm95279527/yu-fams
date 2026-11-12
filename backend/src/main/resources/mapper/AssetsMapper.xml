@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.AssetsMapper">
+
+    <sql id="Base_Column_List">
+        id,name,category,no,img,model,num,date,money,depreciate,department_id,staff_id,location,status,comment,
+        custom1,custom2,custom3,custom4,custom5,custom6,custom7,custom8,custom9,custom10
+    </sql>
+
+    <select id="selectAll" resultType="com.example.entity.Assets">
+         select
+         assets .*,co.id as companyId, co.name as companyName, concat(ifnull(co.name, ''), case when ifnull(co.name, '') = '' then '' else '-' end, department.name) as departmentName, concat(staff.name, case when staff.status = '离职' then '（离职）' else '' end) as staffName
+         from assets 
+         left join department on assets .department_id=department.id
+         left join company co on department.company_id = co.id
+         left join staff on assets .staff_id=staff.id
+        <where>
+            <if test="name != null and name != ''"> and assets.name like concat('%', #{name}, '%')</if>
+            <if test="category != null and category != ''"> and assets.category like concat('%', #{category}, '%')</if>
+            <if test="no != null and no != ''"> and assets.no like concat('%', #{no}, '%')</if>
+            <if test="status != null and status != ''"> and assets.status = #{status}</if>
+            <if test="companyId != null"> and co.id = #{companyId}</if>
+            <if test="departmentId != null"> and assets.department_id = #{departmentId}</if>
+            <if test="staffId != null"> and assets.staff_id = #{staffId}</if>
+            <if test="location != null and location != ''"> and assets.location like concat('%', #{location}, '%')</if>
+            <if test="dateStart != null and dateStart != ''"> and assets.date &gt;= #{dateStart}</if>
+            <if test="dateEnd != null and dateEnd != ''"> and assets.date &lt;= #{dateEnd}</if>
+        </where>
+        order by assets.id desc
+    </select>
+
+    <select id="selectById" resultType="com.example.entity.Assets">
+        select
+        <include refid="Base_Column_List" />
+        from assets
+        where id = #{id}
+    </select>
+
+    <select id="selectJoinedById" resultType="com.example.entity.Assets">
+        select assets.*,co.id as companyId, co.name as companyName, concat(ifnull(co.name, ''), case when ifnull(co.name, '') = '' then '' else '-' end, department.name) as departmentName, concat(staff.name, case when staff.status = '离职' then '（离职）' else '' end) as staffName
+        from assets
+        left join department on assets.department_id = department.id
+        left join company co on department.company_id = co.id
+        left join staff on assets.staff_id = staff.id
+        where assets.id = #{id}
+    </select>
+
+    <select id="selectJoinedByNo" resultType="com.example.entity.Assets">
+        select assets.*,co.id as companyId, co.name as companyName, concat(ifnull(co.name, ''), case when ifnull(co.name, '') = '' then '' else '-' end, department.name) as departmentName, concat(staff.name, case when staff.status = '离职' then '（离职）' else '' end) as staffName
+        from assets
+        left join department on assets.department_id = department.id
+        left join company co on department.company_id = co.id
+        left join staff on assets.staff_id = staff.id
+        where assets.no = #{no}
+        limit 1
+    </select>
+
+    <delete id="deleteById">
+        delete from assets 
+        where  id = #{id}
+    </delete>
+
+    <insert id="insert" parameterType="com.example.entity.Assets" useGeneratedKeys="true" keyProperty="id">
+        insert into assets 
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="name != null">name,</if>
+            <if test="category != null">category,</if>
+            <if test="no != null">no,</if>
+            <if test="img != null">img,</if>
+            <if test="model != null">model,</if>
+            <if test="num != null">num,</if>
+            <if test="date != null">date,</if>
+            <if test="money != null">money,</if>
+            <if test="depreciate != null">depreciate,</if>
+            <if test="departmentId != null">department_id,</if>
+            <if test="staffId != null">staff_id,</if>
+            <if test="location != null">location,</if>
+            <if test="status != null">status,</if>
+            <if test="comment != null">comment,</if>
+            <if test="custom1 != null">custom1,</if>
+            <if test="custom2 != null">custom2,</if>
+            <if test="custom3 != null">custom3,</if>
+            <if test="custom4 != null">custom4,</if>
+            <if test="custom5 != null">custom5,</if>
+            <if test="custom6 != null">custom6,</if>
+            <if test="custom7 != null">custom7,</if>
+            <if test="custom8 != null">custom8,</if>
+            <if test="custom9 != null">custom9,</if>
+            <if test="custom10 != null">custom10,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="name != null">#{name},</if>
+            <if test="category != null">#{category},</if>
+            <if test="no != null">#{no},</if>
+            <if test="img != null">#{img},</if>
+            <if test="model != null">#{model},</if>
+            <if test="num != null">#{num},</if>
+            <if test="date != null">#{date},</if>
+            <if test="money != null">#{money},</if>
+            <if test="depreciate != null">#{depreciate},</if>
+            <if test="departmentId != null">#{departmentId},</if>
+            <if test="staffId != null">#{staffId},</if>
+            <if test="location != null">#{location},</if>
+            <if test="status != null">#{status},</if>
+            <if test="comment != null">#{comment},</if>
+            <if test="custom1 != null">#{custom1},</if>
+            <if test="custom2 != null">#{custom2},</if>
+            <if test="custom3 != null">#{custom3},</if>
+            <if test="custom4 != null">#{custom4},</if>
+            <if test="custom5 != null">#{custom5},</if>
+            <if test="custom6 != null">#{custom6},</if>
+            <if test="custom7 != null">#{custom7},</if>
+            <if test="custom8 != null">#{custom8},</if>
+            <if test="custom9 != null">#{custom9},</if>
+            <if test="custom10 != null">#{custom10},</if>
+        </trim>
+    </insert>
+
+    <update id="updateById" parameterType="com.example.entity.Assets">
+        update assets 
+        <set>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="category != null">
+                category = #{category},
+            </if>
+            <if test="no != null">
+                no = #{no},
+            </if>
+            <if test="img != null">
+                img = #{img},
+            </if>
+            <if test="model != null">
+                model = #{model},
+            </if>
+            <if test="num != null">
+                num = #{num},
+            </if>
+            <if test="date != null">
+                date = #{date},
+            </if>
+            <if test="money != null">
+                money = #{money},
+            </if>
+            <if test="depreciate != null">
+                depreciate = #{depreciate},
+            </if>
+            <if test="departmentId != null">
+                department_id = #{departmentId},
+            </if>
+            <if test="staffId != null">
+                staff_id = #{staffId},
+            </if>
+            <if test="location != null">
+                location = #{location},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="comment != null">
+                comment = #{comment},
+            </if>
+            <if test="custom1 != null">custom1 = #{custom1},</if>
+            <if test="custom2 != null">custom2 = #{custom2},</if>
+            <if test="custom3 != null">custom3 = #{custom3},</if>
+            <if test="custom4 != null">custom4 = #{custom4},</if>
+            <if test="custom5 != null">custom5 = #{custom5},</if>
+            <if test="custom6 != null">custom6 = #{custom6},</if>
+            <if test="custom7 != null">custom7 = #{custom7},</if>
+            <if test="custom8 != null">custom8 = #{custom8},</if>
+            <if test="custom9 != null">custom9 = #{custom9},</if>
+            <if test="custom10 != null">custom10 = #{custom10},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+</mapper>

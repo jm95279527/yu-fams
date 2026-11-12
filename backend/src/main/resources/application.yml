@@ -1,0 +1,37 @@
+server:
+  port: 9091
+
+# 数据库配置
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: YOUR_DB_PASSWORD
+    url: jdbc:mysql://localhost:3306/xm-assets?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false&serverTimezone=GMT%2b8&allowPublicKeyRetrieval=true
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+
+# 配置mybatis实体和xml映射
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.example.entity
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true
+
+# 分页
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+  params: count=countSql
+
+ip: YOUR_SERVER_IP
+# 资产二维码/导出里「二维码链接」的前端基地址：必须是【扫码设备能访问到】的地址。
+# 外网域名（带端口）；若只在内网扫码，改为 http://YOUR_SERVER_IP:88
+front-base-url: http://your-domain.com:88
+
+# 借用归还到期提醒：定时任务执行时间（cron，默认每天 9:00；提前1天/当天/逾期各提醒一次）
+borrow-remind-cron: "0 0 9 * * ?"

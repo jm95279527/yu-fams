@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.RobotConfigMapper">
+
+    <sql id="Base_Column_List">
+        id,name,type,webhook_url as webhookUrl,secret,enabled,remark,create_time as createTime,update_time as updateTime
+    </sql>
+
+    <select id="selectAll" resultType="com.example.entity.RobotConfig">
+        select
+        <include refid="Base_Column_List" />
+        from robot_config
+        <where>
+            <if test="name != null and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="enabled != null"> and enabled = #{enabled}</if>
+        </where>
+        order by id asc
+    </select>
+
+    <select id="selectEnabled" resultType="com.example.entity.RobotConfig">
+        select
+        <include refid="Base_Column_List" />
+        from robot_config
+        where enabled = 1
+        order by id asc
+    </select>
+
+    <select id="selectById" resultType="com.example.entity.RobotConfig">
+        select
+        <include refid="Base_Column_List" />
+        from robot_config
+        where id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.example.entity.RobotConfig" useGeneratedKeys="true" keyProperty="id">
+        insert into robot_config (name, type, webhook_url, secret, enabled, remark, create_time, update_time)
+        values (#{name}, #{type}, #{webhookUrl}, #{secret}, #{enabled}, #{remark}, #{createTime}, #{updateTime})
+    </insert>
+
+    <update id="updateById" parameterType="com.example.entity.RobotConfig">
+        update robot_config
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="webhookUrl != null">webhook_url = #{webhookUrl},</if>
+            secret = #{secret},
+            <if test="enabled != null">enabled = #{enabled},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = #{updateTime},
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        delete from robot_config where id = #{id}
+    </delete>
+
+</mapper>

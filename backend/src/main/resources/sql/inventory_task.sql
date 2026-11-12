@@ -1,0 +1,45 @@
+-- 资产盘点模块：盘点任务 + 盘点明细
+CREATE TABLE IF NOT EXISTS inventory_task (
+    id             INT AUTO_INCREMENT PRIMARY KEY,
+    name           VARCHAR(100) NOT NULL COMMENT '任务名称',
+    scope_type     VARCHAR(10)  NOT NULL DEFAULT 'ALL' COMMENT '范围类型 ALL/DEPT/CATEGORY',
+    scope_id       INT          NULL COMMENT '范围ID（部门ID/分类ID）',
+    scope_name     VARCHAR(100) NULL COMMENT '范围名称快照',
+    status         VARCHAR(10)  NOT NULL DEFAULT '盘点中' COMMENT '盘点中/已完成',
+    creator_id     INT          NULL,
+    creator_name   VARCHAR(50)  NULL,
+    total_count    INT          NOT NULL DEFAULT 0 COMMENT '应盘总数(含盘盈)',
+    normal_count   INT          NOT NULL DEFAULT 0 COMMENT '正常数',
+    profit_count   INT          NOT NULL DEFAULT 0 COMMENT '盘盈数',
+    loss_count     INT          NOT NULL DEFAULT 0 COMMENT '盘亏数',
+    abnormal_count INT          NOT NULL DEFAULT 0 COMMENT '异常数',
+    remark         VARCHAR(500) NULL,
+    create_time    VARCHAR(30)  NULL,
+    finish_time    VARCHAR(30)  NULL,
+    update_time    VARCHAR(30)  NULL
+) COMMENT '资产盘点任务';
+
+CREATE TABLE IF NOT EXISTS inventory_item (
+    id              INT AUTO_INCREMENT PRIMARY KEY,
+    task_id         INT NOT NULL COMMENT '盘点任务ID',
+    assets_id       INT NULL COMMENT '资产ID',
+    assets_no       VARCHAR(50)  NULL COMMENT '资产编号',
+    assets_name     VARCHAR(100) NULL COMMENT '资产名称',
+    category        VARCHAR(100) NULL COMMENT '分类',
+    department_id   INT          NULL,
+    department_name VARCHAR(50)  NULL COMMENT '台账部门',
+    staff_id        INT          NULL,
+    staff_name      VARCHAR(50)  NULL COMMENT '台账责任人',
+    location        VARCHAR(200) NULL COMMENT '台账地点',
+    actual_location VARCHAR(200) NULL COMMENT '实盘地点',
+    item_status     VARCHAR(10)  NOT NULL DEFAULT '未盘' COMMENT '未盘/正常/异常/盘亏/盘盈',
+    is_extra        TINYINT      NOT NULL DEFAULT 0 COMMENT '1=范围外盘盈',
+    scanner_id      INT          NULL,
+    scanner_name    VARCHAR(50)  NULL,
+    scan_time       VARCHAR(30)  NULL,
+    comment         VARCHAR(300) NULL,
+    create_time     VARCHAR(30)  NULL,
+    update_time     VARCHAR(30)  NULL,
+    KEY idx_task (task_id),
+    KEY idx_assets (assets_id)
+) COMMENT '资产盘点明细';

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.AssetFieldConfigMapper">
+
+    <select id="selectAll" resultType="com.example.entity.AssetFieldConfig">
+        select id, field_key as fieldKey, label, field_type as fieldType, options,
+               enabled, is_system as isSystem, sort_num as sortNum,
+               update_time as updateTime
+        from asset_field_config
+        order by sort_num asc, id asc
+    </select>
+
+    <select id="selectByKey" resultType="com.example.entity.AssetFieldConfig">
+        select id, field_key as fieldKey, label, field_type as fieldType, options,
+               enabled, is_system as isSystem, sort_num as sortNum,
+               update_time as updateTime
+        from asset_field_config
+        where field_key = #{fieldKey}
+    </select>
+
+    <update id="updateById" parameterType="com.example.entity.AssetFieldConfig">
+        update asset_field_config
+        <set>
+            <if test="label != null">label = #{label},</if>
+            <if test="fieldType != null">field_type = #{fieldType},</if>
+            <if test="options != null">options = #{options},</if>
+            <if test="enabled != null">enabled = #{enabled},</if>
+            <if test="sortNum != null">sort_num = #{sortNum},</if>
+            update_time = now()
+        </set>
+        where id = #{id}
+    </update>
+
+</mapper>

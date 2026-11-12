@@ -1,0 +1,33 @@
+-- 资产报废单表
+-- 依赖：assets 表（status 字段）、assets_detail（变更明细）、department、staff
+CREATE TABLE IF NOT EXISTS assets_scrap (
+  id INT AUTO_INCREMENT PRIMARY KEY COMMENT '主键ID',
+  assets_id INT NOT NULL COMMENT '资产ID',
+  assets_no VARCHAR(64) COMMENT '资产编号（快照）',
+  assets_name VARCHAR(128) COMMENT '资产名称（快照）',
+  category VARCHAR(64) COMMENT '分类（快照）',
+  model VARCHAR(128) COMMENT '型号（快照）',
+  money DECIMAL(12,2) COMMENT '原值（快照）',
+  depreciate VARCHAR(64) COMMENT '折旧方式（快照，与 assets.depreciate 一致）',
+  department_id INT COMMENT '部门ID（快照）',
+  department_name VARCHAR(64) COMMENT '部门名称（快照）',
+  staff_id INT COMMENT '责任人ID（快照）',
+  staff_name VARCHAR(64) COMMENT '责任人名称（快照）',
+  location VARCHAR(255) COMMENT '存放地点（快照）',
+  scrap_type VARCHAR(32) COMMENT '报废类型：正常报废/毁损/丢失/其他',
+  reason VARCHAR(500) COMMENT '报废原因',
+  residual_value DECIMAL(12,2) DEFAULT 0 COMMENT '残值',
+  apply_time DATETIME COMMENT '申请时间',
+  applicant_id INT COMMENT '申请人ID',
+  applicant_name VARCHAR(64) COMMENT '申请人姓名',
+  status VARCHAR(20) DEFAULT '待审批' COMMENT '状态：待审批/已报废/已拒绝',
+  approver_id INT COMMENT '审批人ID',
+  approver_name VARCHAR(64) COMMENT '审批人姓名',
+  approve_time DATETIME COMMENT '审批时间',
+  approve_comment VARCHAR(500) COMMENT '审批意见/驳回原因',
+  comment VARCHAR(500) COMMENT '备注',
+  create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  INDEX idx_assets_id (assets_id),
+  INDEX idx_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='资产报废单';

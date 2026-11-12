@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.NumberRuleMapper">
+
+    <sql id="Base_Column_List">
+        id,name,pattern,enabled,create_time,update_time
+    </sql>
+
+    <select id="selectOne" resultType="com.example.entity.NumberRule">
+        select
+        <include refid="Base_Column_List" />
+        from number_rule
+        order by id asc
+        limit 1
+    </select>
+
+    <insert id="insert" parameterType="com.example.entity.NumberRule" useGeneratedKeys="true" keyProperty="id">
+        insert into number_rule (name, pattern, enabled, create_time, update_time)
+        values (#{name}, #{pattern}, #{enabled}, #{createTime}, #{updateTime})
+    </insert>
+
+    <update id="updateById" parameterType="com.example.entity.NumberRule">
+        update number_rule
+        <set>
+            name = #{name},
+            pattern = #{pattern},
+            <if test="enabled != null">enabled = #{enabled},</if>
+            update_time = #{updateTime},
+        </set>
+        where id = #{id}
+    </update>
+
+</mapper>

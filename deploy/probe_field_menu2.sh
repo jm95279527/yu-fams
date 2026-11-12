@@ -1,0 +1,12 @@
+#!/bin/bash
+M="mysql -uroot -pYOUR_DB_PASSWORD xm-assets -N"
+echo "=== sys_menu 结构 ==="
+$M -e "desc sys_menu"
+echo "=== sys_menu 全量 ==="
+$M -e "select * from sys_menu order by id"
+echo "=== sys_role 结构 ==="
+$M -e "desc sys_role"
+echo "=== sys_role 全量 ==="
+$M -e "select * from sys_role"
+echo "=== sys_role_menu 中基础资料(31?) ==="
+$M -e "select concat(rm.role_id,' | ',rm.menu_id) from sys_role_menu rm order by rm.role_id, rm.menu_id"

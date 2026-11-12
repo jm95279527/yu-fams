@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.DepartmentMapper">
+
+    <sql id="Base_Column_List">
+        id,name,address,pid,level,company_id
+    </sql>
+
+    <select id="selectAll" resultType="com.example.entity.Department">
+        select
+        d.id, d.name, d.address, d.pid, d.level, d.company_id,
+        c.name as companyName,
+        concat(ifnull(c.name, ''), case when ifnull(c.name, '') = '' then '' else '-' end, d.name) as label
+        from department d
+        left join company c on d.company_id = c.id
+        <where>
+            <if test="id != null"> and d.id = #{id}</if>
+            <if test="name != null"> and d.name like concat('%', #{name}, '%')</if>
+            <if test="address != null"> and d.address like concat('%', #{address}, '%')</if>
+            <if test="pid != null"> and d.pid = #{pid}</if>
+            <if test="level != null"> and d.level = #{level}</if>
+            <if test="companyId != null"> and d.company_id = #{companyId}</if>
+        </where>
+        order by d.company_id asc, d.id asc
+    </select>
+
+    <select id="countByCompanyId" resultType="int">
+        select count(*) from department where company_id = #{companyId}
+    </select>
+
+    <select id="selectById" resultType="com.example.entity.Department">
+        select
+        d.id, d.name, d.address, d.pid, d.level, d.company_id,
+        c.name as companyName,
+        concat(ifnull(c.name, ''), case when ifnull(c.name, '') = '' then '' else '-' end, d.name) as label
+        from department d
+        left join company c on d.company_id = c.id
+        where d.id = #{id}
+    </select>
+
+    <delete id="deleteById">
+        delete from department
+        where  id = #{id}
+    </delete>
+
+    <insert id="insert" parameterType="com.example.entity.Department" useGeneratedKeys="true" keyProperty="id">
+        insert into department
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="name != null">name,</if>
+            <if test="address != null">address,</if>
+            <if test="pid != null">pid,</if>
+            <if test="level != null">level,</if>
+            <if test="companyId != null">company_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="name != null">#{name},</if>
+            <if test="address != null">#{address},</if>
+            <if test="pid != null">#{pid},</if>
+            <if test="level != null">#{level},</if>
+            <if test="companyId != null">#{companyId},</if>
+        </trim>
+    </insert>
+
+    <update id="updateById" parameterType="com.example.entity.Department">
+        update department
+        <set>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="address != null">
+                address = #{address},
+            </if>
+            <if test="pid != null">
+                pid = #{pid},
+            </if>
+            <if test="level != null">
+                level = #{level},
+            </if>
+            <if test="companyId != null">
+                company_id = #{companyId},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+</mapper>

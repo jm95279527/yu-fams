@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.CategoryMapper">
+
+    <sql id="Base_Column_List">
+        c.id,c.name,c.code,c.pid,p.name as parentName
+    </sql>
+
+    <select id="selectAll" resultType="com.example.entity.Category">
+        select
+        <include refid="Base_Column_List" />
+        from category c
+        left join category p on c.pid = p.id
+        <where>
+            <if test="id != null"> and c.id = #{id}</if>
+            <if test="name != null and name != ''"> and c.name like concat('%', #{name}, '%')</if>
+            <if test="pid != null"> and c.pid = #{pid}</if>
+        </where>
+        order by case when c.pid = 0 then c.id else c.pid end asc, c.pid asc, c.id asc
+    </select>
+
+    <select id="selectByName" resultType="com.example.entity.Category">
+        select
+        <include refid="Base_Column_List" />
+        from category c
+        left join category p on c.pid = p.id
+        where c.name = #{name}
+        limit 1
+    </select>
+
+    <select id="selectById" resultType="com.example.entity.Category">
+        select
+        <include refid="Base_Column_List" />
+        from category c
+        left join category p on c.pid = p.id
+        where c.id = #{id}
+    </select>
+
+    <select id="countChildren" resultType="int">
+        select count(*) from category where pid = #{pid}
+    </select>
+
+    <select id="countByName" resultType="int">
+        select count(*) from category
+        where name = #{name}
+        <if test="excludeId != null"> and id != #{excludeId}</if>
+    </select>
+
+    <select id="countAssetsByName" resultType="int">
+        select count(*) from assets where category = #{name}
+    </select>
+
+    <select id="countByCode" resultType="int">
+        select count(*) from category
+        where code = #{code}
+        <if test="excludeId != null"> and id != #{excludeId}</if>
+    </select>
+
+    <delete id="deleteById">
+        delete from category
+        where  id = #{id}
+    </delete>
+
+    <insert id="insert" parameterType="com.example.entity.Category" useGeneratedKeys="true" keyProperty="id">
+        insert into category
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="name != null">name,</if>
+            <if test="code != null">code,</if>
+            <if test="pid != null">pid,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="name != null">#{name},</if>
+            <if test="code != null">#{code},</if>
+            <if test="pid != null">#{pid},</if>
+        </trim>
+    </insert>
+
+    <update id="updateById" parameterType="com.example.entity.Category">
+        update category
+        <set>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="code != null">
+                code = #{code},
+            </if>
+            <if test="pid != null">
+                pid = #{pid},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+</mapper>

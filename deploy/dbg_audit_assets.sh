@@ -1,0 +1,17 @@
+#!/bin/bash
+M="mysql -uroot -pYOUR_DB_PASSWORD xm-assets"
+echo "=== audit_log 结构 ==="
+$M -e "desc audit_log"
+echo "=== 最近 20 条审计 ==="
+$M -e "select id,username,role,method,uri,status_code,create_time from audit_log order by id desc limit 20" 2>/dev/null \
+ || $M -e "select * from audit_log order by id desc limit 5"
+echo "=== assets_detail 最近 10 条 ==="
+$M -e "select id,assets_id,assets_no,operation_type,operation_time,operator_name,description from assets_detail order by id desc limit 10"
+echo "=== assets_in 全部 ==="
+$M -e "select id,assets_id,name,no,status,audit_date from assets_in order by id"
+echo "=== MySQL binlog 是否开启 ==="
+$M -N -e "show variables like 'log_bin'"
+echo "=== 当前连接 ==="
+$M -e "show processlist"
+echo "=== journal 中 14:45 后的 delete/truncate ==="
+journalctl -u yufams --since "2026-10-17 14:45:00" --no-pager | grep -iE "delete from|truncate|update assets" | tail -20 || echo "(none)"

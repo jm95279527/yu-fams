@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.InventoryMapper">
+
+    <sql id="Base_Column_List">
+        id, assets_id, assets_name, assets_no, inventory_time, staff_id, staff_name, 
+        result, status, location, comment, create_time, update_time
+    </sql>
+
+    <select id="selectAll" resultType="com.example.entity.Inventory">
+        select
+        i.id, i.assets_id, i.inventory_time, i.staff_id, i.result, i.status, i.location, i.comment, 
+        i.create_time, i.update_time,
+        a.name as assetsName, a.no as assetsNo, concat(s.name, case when s.status = '离职' then '（离职）' else '' end) as staffName
+        from inventory i
+        left join assets a on i.assets_id = a.id
+        left join staff s on i.staff_id = s.id
+        <where>
+            <if test="assetsName != null and assetsName != ''">
+                AND a.name LIKE CONCAT('%', #{assetsName}, '%')
+            </if>
+            <if test="staffId != null"> and i.staff_id = #{staffId}</if>
+            <if test="status != null and status != ''"> and i.status = #{status}</if>
+            <if test="result != null and result != ''"> and i.result = #{result}</if>
+        </where>
+        order by i.id desc
+    </select>
+
+    <select id="selectById" resultType="com.example.entity.Inventory">
+        select
+        i.id, i.assets_id, i.inventory_time, i.staff_id, i.result, i.status, i.location, i.comment, 
+        i.create_time, i.update_time,
+        a.name as assetsName, a.no as assetsNo, concat(s.name, case when s.status = '离职' then '（离职）' else '' end) as staffName
+        from inventory i
+        left join assets a on i.assets_id = a.id
+        left join staff s on i.staff_id = s.id
+        where i.id = #{id}
+    </select>
+
+    <delete id="deleteById">
+        delete from inventory
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteBatch">
+        delete from inventory
+        where id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <insert id="insert" parameterType="com.example.entity.Inventory" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO inventory(
+            assets_id, inventory_time, staff_id, staff_name,
+            result, status, location, comment, create_time, update_time
+        ) VALUES (
+            #{assetsId}, #{inventoryTime}, #{staffId}, #{staffName},
+            #{result}, #{status}, #{location}, #{comment}, NOW(), NOW()
+        )
+    </insert>
+
+    <update id="updateById" parameterType="com.example.entity.Inventory">
+        update inventory
+        <set>
+            <if test="assetsId != null">
+                assets_id = #{assetsId},
+            </if>
+            <if test="inventoryTime != null">
+                inventory_time = #{inventoryTime},
+            </if>
+            <if test="staffId != null">
+                staff_id = #{staffId},
+            </if>
+            <if test="staffName != null">
+                staff_name = #{staffName},
+            </if>
+            <if test="result != null">
+                result = #{result},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="location != null">
+                location = #{location},
+            </if>
+            <if test="comment != null">
+                comment = #{comment},
+            </if>
+            update_time = NOW()
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="selectPage" resultType="com.example.entity.Inventory">
+        select
+        i.id, i.assets_id, i.inventory_time, i.staff_id, i.result, i.status, i.location, i.comment, 
+        i.create_time, i.update_time,
+        a.name as assetsName, a.no as assetsNo, concat(s.name, case when s.status = '离职' then '（离职）' else '' end) as staffName
+        from inventory i
+        left join assets a on i.assets_id = a.id
+        left join staff s on i.staff_id = s.id
+        <where>
+            <if test="assetsName != null and assetsName != ''">
+                AND a.name LIKE CONCAT('%', #{assetsName}, '%')
+            </if>
+            <if test="staffId != null"> and i.staff_id = #{staffId}</if>
+            <if test="status != null and status != ''"> and i.status = #{status}</if>
+            <if test="result != null and result != ''"> and i.result = #{result}</if>
+        </where>
+        order by i.id desc
+    </select>
+
+    <select id="selectRecent" resultType="com.example.entity.Inventory">
+        SELECT i.id, i.assets_id, i.inventory_time, i.staff_id, i.result, i.status, i.location, i.comment, 
+               i.create_time, i.update_time,
+               a.name AS assetsName, a.no AS assetsNo, concat(s.name, case when s.status = '离职' then '（离职）' else '' end) AS staffName
+        FROM inventory i
+                 LEFT JOIN assets a ON i.assets_id = a.id
+                 LEFT JOIN staff s ON i.staff_id = s.id
+        ORDER BY i.inventory_time DESC
+            LIMIT #{limit}
+    </select>
+
+</mapper> 

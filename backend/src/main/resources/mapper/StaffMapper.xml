@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.StaffMapper">
+
+    <sql id="Base_Column_List">
+        s.id,s.username,s.emp_no,s.password,s.name,s.gender,s.phone,s.email,s.id_card,s.birth_date,
+        s.education,s.native_place,s.address,s.emergency_contact,s.emergency_phone,
+        s.avatar,s.role,s.department_id,
+        s.position,s.entry_date,s.status,s.leave_date,s.remark,
+        concat(ifnull(co.name, ''), case when ifnull(co.name, '') = '' then '' else '-' end, d.name) AS departmentName
+    </sql>
+
+    <select id="selectAll" resultType="com.example.entity.Staff">
+        select
+        <include refid="Base_Column_List" />
+        from staff s
+        left join department d on s.department_id = d.id
+        left join company co on d.company_id = co.id
+        <where>
+            <if test="id != null"> and s.id= #{id}</if>
+            <if test="username != null"> and s.username like concat('%', #{username}, '%')</if>
+            <if test="empNo != null"> and s.emp_no like concat('%', #{empNo}, '%')</if>
+            <if test="password != null"> and s.password= #{password}</if>
+            <if test="name != null"> and s.name like concat('%', #{name}, '%')</if>
+            <if test="gender != null"> and s.gender= #{gender}</if>
+            <if test="phone != null"> and s.phone like concat('%', #{phone}, '%')</if>
+            <if test="email != null"> and s.email= #{email}</if>
+            <if test="idCard != null"> and s.id_card= #{idCard}</if>
+            <if test="education != null"> and s.education= #{education}</if>
+            <if test="avatar != null"> and s.avatar= #{avatar}</if>
+            <if test="role != null"> and s.role= #{role}</if>
+            <if test="departmentId != null"> and s.department_id= #{departmentId}</if>
+            <if test="position != null"> and s.position like concat('%', #{position}, '%')</if>
+            <if test="status != null"> and s.status= #{status}</if>
+        </where>
+        order by s.id desc
+    </select>
+
+    <select id="selectById" resultType="com.example.entity.Staff">
+        select
+        <include refid="Base_Column_List" />
+        from staff s
+        left join department d on s.department_id = d.id
+        left join company co on d.company_id = co.id
+        where s.id = #{id}
+    </select>
+
+    <delete id="deleteById">
+        delete from staff
+        where  id = #{id}
+    </delete>
+
+    <insert id="insert" parameterType="com.example.entity.Staff" useGeneratedKeys="true">
+        insert into staff
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="id != null">id,</if>
+                <if test="username != null">username,</if>
+                <if test="empNo != null">emp_no,</if>
+                <if test="password != null">password,</if>
+                <if test="name != null">name,</if>
+                <if test="gender != null">gender,</if>
+                <if test="phone != null">phone,</if>
+                <if test="email != null">email,</if>
+                <if test="idCard != null">id_card,</if>
+                <if test="birthDate != null">birth_date,</if>
+                <if test="education != null">education,</if>
+                <if test="nativePlace != null">native_place,</if>
+                <if test="address != null">address,</if>
+                <if test="emergencyContact != null">emergency_contact,</if>
+                <if test="emergencyPhone != null">emergency_phone,</if>
+                <if test="avatar != null">avatar,</if>
+                <if test="role != null">role,</if>
+                <if test="departmentId != null">department_id,</if>
+                <if test="position != null">position,</if>
+                <if test="entryDate != null">entry_date,</if>
+                <if test="status != null">status,</if>
+                <if test="leaveDate != null">leave_date,</if>
+                <if test="remark != null">remark,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="id != null">#{id},</if>
+                <if test="username != null">#{username},</if>
+                <if test="empNo != null">#{empNo},</if>
+                <if test="password != null">#{password},</if>
+                <if test="name != null">#{name},</if>
+                <if test="gender != null">#{gender},</if>
+                <if test="phone != null">#{phone},</if>
+                <if test="email != null">#{email},</if>
+                <if test="idCard != null">#{idCard},</if>
+                <if test="birthDate != null">#{birthDate},</if>
+                <if test="education != null">#{education},</if>
+                <if test="nativePlace != null">#{nativePlace},</if>
+                <if test="address != null">#{address},</if>
+                <if test="emergencyContact != null">#{emergencyContact},</if>
+                <if test="emergencyPhone != null">#{emergencyPhone},</if>
+                <if test="avatar != null">#{avatar},</if>
+                <if test="role != null">#{role},</if>
+                <if test="departmentId != null">#{departmentId},</if>
+                <if test="position != null">#{position},</if>
+                <if test="entryDate != null">#{entryDate},</if>
+                <if test="status != null">#{status},</if>
+                <if test="leaveDate != null">#{leaveDate},</if>
+                <if test="remark != null">#{remark},</if>
+        </trim>
+    </insert>
+
+    <update id="updateById" parameterType="com.example.entity.Staff">
+        update staff
+        <set>
+            <if test="username != null">
+                username = #{username},
+            </if>
+            <if test="empNo != null">
+                emp_no = #{empNo},
+            </if>
+            <if test="password != null">
+                password = #{password},
+            </if>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="gender != null">
+                gender = #{gender},
+            </if>
+            <if test="phone != null">
+                phone = #{phone},
+            </if>
+            <if test="email != null">
+                email = #{email},
+            </if>
+            <if test="idCard != null">
+                id_card = #{idCard},
+            </if>
+            <if test="birthDate != null">
+                birth_date = #{birthDate},
+            </if>
+            <if test="education != null">
+                education = #{education},
+            </if>
+            <if test="nativePlace != null">
+                native_place = #{nativePlace},
+            </if>
+            <if test="address != null">
+                address = #{address},
+            </if>
+            <if test="emergencyContact != null">
+                emergency_contact = #{emergencyContact},
+            </if>
+            <if test="emergencyPhone != null">
+                emergency_phone = #{emergencyPhone},
+            </if>
+            <if test="avatar != null">
+                avatar = #{avatar},
+            </if>
+            <if test="role != null">
+                role = #{role},
+            </if>
+            <if test="departmentId != null">
+                department_id = #{departmentId},
+            </if>
+            <if test="position != null">
+                position = #{position},
+            </if>
+            <if test="entryDate != null">
+                entry_date = #{entryDate},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="leaveDate != null">
+                leave_date = #{leaveDate},
+            </if>
+            <if test="remark != null">
+                remark = #{remark},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+</mapper>

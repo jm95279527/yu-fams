@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.AssetsInMapper">
+
+    <sql id="Base_Column_List">
+        id,assets_id,name,category,model,num,money,depreciate,purchase_no,supplier,department_id,manager_id,
+        location,img,staff_id,date,accept_date,accept_user,accept_result,comment,status,audit_user,audit_date,reject_reason
+    </sql>
+
+    <select id="selectAll" resultType="com.example.entity.AssetsIn">
+        select
+        assets_in.*, assets.name as assetsName, assets.no as assetsNo,
+        co.id as companyId, co.name as companyName,
+        concat(coalesce(staff.name, adm.name), case when staff.status = '离职' then '（离职）' else '' end) as staffName,
+        concat(ifnull(co.name, ''), case when ifnull(co.name, '') = '' then '' else '-' end, department.name) as departmentName,
+        concat(manager.name, case when manager.status = '离职' then '（离职）' else '' end) as managerName
+        from assets_in
+        left join assets on assets_in.assets_id = assets.id
+        left join staff on assets_in.staff_id = staff.id
+        left join admin adm on assets_in.staff_id = adm.id
+        left join department on assets_in.department_id = department.id
+        left join company co on department.company_id = co.id
+        left join staff manager on assets_in.manager_id = manager.id
+        <where>
+            <if test="staffId != null"> and assets_in.staff_id = #{staffId}</if>
+            <if test="status != null and status != ''"> and assets_in.status = #{status}</if>
+            <if test="companyId != null"> and co.id = #{companyId}</if>
+            <if test="purchaseNo != null and purchaseNo != ''"> and assets_in.purchase_no like concat('%', #{purchaseNo}, '%')</if>
+            <if test="name != null and name != ''"> and assets_in.name like concat('%', #{name}, '%')</if>
+            <if test="assetsName != null and assetsName != ''">
+                and (assets_in.name like concat('%', #{assetsName}, '%') or assets.name like concat('%', #{assetsName}, '%'))
+            </if>
+            <if test="category != null and category != ''"> and assets_in.category = #{category}</if>
+        </where>
+        order by assets_in.id desc
+    </select>
+
+    <select id="selectById" resultType="com.example.entity.AssetsIn">
+        select
+        assets_in.*, assets.name as assetsName, assets.no as assetsNo,
+        co.id as companyId, co.name as companyName,
+        concat(coalesce(staff.name, adm.name), case when staff.status = '离职' then '（离职）' else '' end) as staffName,
+        concat(ifnull(co.name, ''), case when ifnull(co.name, '') = '' then '' else '-' end, department.name) as departmentName,
+        concat(manager.name, case when manager.status = '离职' then '（离职）' else '' end) as managerName
+        from assets_in
+        left join assets on assets_in.assets_id = assets.id
+        left join staff on assets_in.staff_id = staff.id
+        left join admin adm on assets_in.staff_id = adm.id
+        left join department on assets_in.department_id = department.id
+        left join company co on department.company_id = co.id
+        left join staff manager on assets_in.manager_id = manager.id
+        where assets_in.id = #{id}
+    </select>
+
+    <delete id="deleteById">
+        delete from assets_in
+        where  id = #{id}
+    </delete>
+
+    <insert id="insert" parameterType="com.example.entity.AssetsIn" useGeneratedKeys="true" keyProperty="id">
+        insert into assets_in
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="assetsId != null">assets_id,</if>
+            <if test="name != null">name,</if>
+            <if test="category != null">category,</if>
+            <if test="model != null">model,</if>
+            <if test="num != null">num,</if>
+            <if test="money != null">money,</if>
+            <if test="depreciate != null">depreciate,</if>
+            <if test="purchaseNo != null">purchase_no,</if>
+            <if test="supplier != null">supplier,</if>
+            <if test="departmentId != null">department_id,</if>
+            <if test="managerId != null">manager_id,</if>
+            <if test="location != null">location,</if>
+            <if test="img != null">img,</if>
+            <if test="staffId != null">staff_id,</if>
+            <if test="date != null">date,</if>
+            <if test="acceptDate != null">accept_date,</if>
+            <if test="acceptUser != null">accept_user,</if>
+            <if test="acceptResult != null">accept_result,</if>
+            <if test="comment != null">comment,</if>
+            <if test="status != null">status,</if>
+            <if test="auditUser != null">audit_user,</if>
+            <if test="auditDate != null">audit_date,</if>
+            <if test="rejectReason != null">reject_reason,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="assetsId != null">#{assetsId},</if>
+            <if test="name != null">#{name},</if>
+            <if test="category != null">#{category},</if>
+            <if test="model != null">#{model},</if>
+            <if test="num != null">#{num},</if>
+            <if test="money != null">#{money},</if>
+            <if test="depreciate != null">#{depreciate},</if>
+            <if test="purchaseNo != null">#{purchaseNo},</if>
+            <if test="supplier != null">#{supplier},</if>
+            <if test="departmentId != null">#{departmentId},</if>
+            <if test="managerId != null">#{managerId},</if>
+            <if test="location != null">#{location},</if>
+            <if test="img != null">#{img},</if>
+            <if test="staffId != null">#{staffId},</if>
+            <if test="date != null">#{date},</if>
+            <if test="acceptDate != null">#{acceptDate},</if>
+            <if test="acceptUser != null">#{acceptUser},</if>
+            <if test="acceptResult != null">#{acceptResult},</if>
+            <if test="comment != null">#{comment},</if>
+            <if test="status != null">#{status},</if>
+            <if test="auditUser != null">#{auditUser},</if>
+            <if test="auditDate != null">#{auditDate},</if>
+            <if test="rejectReason != null">#{rejectReason},</if>
+        </trim>
+    </insert>
+
+    <update id="updateById" parameterType="com.example.entity.AssetsIn">
+        update assets_in
+        <set>
+            <if test="assetsId != null">
+                assets_id = #{assetsId},
+            </if>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="category != null">
+                category = #{category},
+            </if>
+            <if test="model != null">
+                model = #{model},
+            </if>
+            <if test="num != null">
+                num = #{num},
+            </if>
+            <if test="money != null">
+                money = #{money},
+            </if>
+            <if test="depreciate != null">
+                depreciate = #{depreciate},
+            </if>
+            <if test="purchaseNo != null">
+                purchase_no = #{purchaseNo},
+            </if>
+            <if test="supplier != null">
+                supplier = #{supplier},
+            </if>
+            <if test="departmentId != null">
+                department_id = #{departmentId},
+            </if>
+            <if test="managerId != null">
+                manager_id = #{managerId},
+            </if>
+            <if test="location != null">
+                location = #{location},
+            </if>
+            <if test="img != null">
+                img = #{img},
+            </if>
+            <if test="staffId != null">
+                staff_id = #{staffId},
+            </if>
+            <if test="date != null">
+                date = #{date},
+            </if>
+            <if test="acceptDate != null">
+                accept_date = #{acceptDate},
+            </if>
+            <if test="acceptUser != null">
+                accept_user = #{acceptUser},
+            </if>
+            <if test="acceptResult != null">
+                accept_result = #{acceptResult},
+            </if>
+            <if test="comment != null">
+                comment = #{comment},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="auditUser != null">
+                audit_user = #{auditUser},
+            </if>
+            <if test="auditDate != null">
+                audit_date = #{auditDate},
+            </if>
+            <if test="rejectReason != null">
+                reject_reason = #{rejectReason},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+</mapper>

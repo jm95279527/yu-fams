@@ -1,0 +1,14 @@
+-- 员工管理模块改造：人事档案化字段
+ALTER TABLE staff ADD COLUMN emp_no VARCHAR(50) DEFAULT NULL COMMENT '工号' AFTER username;
+ALTER TABLE staff ADD COLUMN gender VARCHAR(10) DEFAULT NULL COMMENT '性别' AFTER name;
+ALTER TABLE staff ADD COLUMN id_card VARCHAR(20) DEFAULT NULL COMMENT '身份证号' AFTER email;
+ALTER TABLE staff ADD COLUMN birth_date DATE DEFAULT NULL COMMENT '出生日期' AFTER id_card;
+ALTER TABLE staff ADD COLUMN education VARCHAR(50) DEFAULT NULL COMMENT '学历' AFTER birth_date;
+ALTER TABLE staff ADD COLUMN native_place VARCHAR(100) DEFAULT NULL COMMENT '籍贯' AFTER education;
+ALTER TABLE staff ADD COLUMN address VARCHAR(255) DEFAULT NULL COMMENT '家庭住址' AFTER native_place;
+ALTER TABLE staff ADD COLUMN emergency_contact VARCHAR(50) DEFAULT NULL COMMENT '紧急联系人' AFTER address;
+ALTER TABLE staff ADD COLUMN emergency_phone VARCHAR(30) DEFAULT NULL COMMENT '紧急联系电话' AFTER emergency_contact;
+ALTER TABLE staff ADD COLUMN leave_date DATE DEFAULT NULL COMMENT '离职日期' AFTER status;
+ALTER TABLE staff ADD COLUMN remark VARCHAR(500) DEFAULT NULL COMMENT '备注' AFTER leave_date;
+-- 工号唯一索引（允许 NULL，存量数据不冲突）
+ALTER TABLE staff ADD UNIQUE INDEX uk_staff_emp_no (emp_no);

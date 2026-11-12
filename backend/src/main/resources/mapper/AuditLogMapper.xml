@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.AuditLogMapper">
+
+    <insert id="insert" parameterType="com.example.entity.AuditLog" useGeneratedKeys="true">
+        insert into audit_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="username != null">username,</if>
+            <if test="role != null">role,</if>
+            <if test="ip != null">ip,</if>
+            <if test="method != null">method,</if>
+            <if test="uri != null">uri,</if>
+            <if test="params != null">params,</if>
+            <if test="resultCode != null">result_code,</if>
+            <if test="status != null">status,</if>
+            <if test="costMs != null">cost_ms,</if>
+            create_time,
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="username != null">#{username},</if>
+            <if test="role != null">#{role},</if>
+            <if test="ip != null">#{ip},</if>
+            <if test="method != null">#{method},</if>
+            <if test="uri != null">#{uri},</if>
+            <if test="params != null">#{params},</if>
+            <if test="resultCode != null">#{resultCode},</if>
+            <if test="status != null">#{status},</if>
+            <if test="costMs != null">#{costMs},</if>
+            now(),
+        </trim>
+    </insert>
+
+    <select id="selectAll" resultType="com.example.entity.AuditLog">
+        select
+            id,
+            username,
+            role,
+            ip,
+            method,
+            uri,
+            params,
+            result_code as resultCode,
+            status,
+            cost_ms as costMs,
+            DATE_FORMAT(create_time, '%Y-%m-%d %H:%i:%s') as createTime
+        from audit_log
+        <where>
+            <if test="username != null and username != ''"> and username like concat('%', #{username}, '%')</if>
+            <if test="uri != null and uri != ''"> and uri like concat('%', #{uri}, '%')</if>
+            <if test="method != null and method != ''"> and method = #{method}</if>
+            <if test="resultCode != null and resultCode != ''"> and result_code = #{resultCode}</if>
+        </where>
+        order by id desc
+    </select>
+
+    <delete id="deleteById">
+        delete from audit_log where id = #{id}
+    </delete>
+
+    <delete id="deleteBatch">
+        delete from audit_log where id in
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <delete id="cleanBefore">
+        delete from audit_log where create_time &lt; DATE_SUB(NOW(), INTERVAL #{days} DAY)
+    </delete>
+
+</mapper>

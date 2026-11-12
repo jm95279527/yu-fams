@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.NotifyLogMapper">
+
+    <sql id="Base_Column_List">
+        id,event_key as eventKey,biz_type as bizType,biz_id as bizId,title,content,
+        robot_id as robotId,robot_name as robotName,status,response,create_time as createTime
+    </sql>
+
+    <select id="selectAll" resultType="com.example.entity.NotifyLog">
+        select
+        <include refid="Base_Column_List" />
+        from notify_log
+        <where>
+            <if test="bizType != null and bizType != ''"> and biz_type = #{bizType}</if>
+            <if test="status != null and status != ''"> and status = #{status}</if>
+            <if test="eventKey != null and eventKey != ''"> and event_key = #{eventKey}</if>
+            <if test="title != null and title != ''">
+                and (title like concat('%', #{title}, '%') or content like concat('%', #{title}, '%'))
+            </if>
+            <if test="createTime != null and createTime != ''"> and create_time like concat(#{createTime}, '%')</if>
+        </where>
+        order by id desc
+    </select>
+
+    <select id="selectById" resultType="com.example.entity.NotifyLog">
+        select
+        <include refid="Base_Column_List" />
+        from notify_log
+        where id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.example.entity.NotifyLog" useGeneratedKeys="true" keyProperty="id">
+        insert into notify_log (event_key, biz_type, biz_id, title, content, robot_id, robot_name, status, response, create_time)
+        values (#{eventKey}, #{bizType}, #{bizId}, #{title}, #{content}, #{robotId}, #{robotName}, #{status}, #{response}, #{createTime})
+    </insert>
+
+    <delete id="deleteById">
+        delete from notify_log where id = #{id}
+    </delete>
+
+    <delete id="deleteBatch">
+        delete from notify_log where id in
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <delete id="cleanBefore">
+        delete from notify_log where create_time &lt; #{beforeTime}
+    </delete>
+
+</mapper>
